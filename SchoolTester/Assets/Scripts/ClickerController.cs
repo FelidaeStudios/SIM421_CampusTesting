@@ -6,15 +6,15 @@ using UnityEngine.Networking;
 
 public class ClickerController : MonoBehaviour
 {
-    private int currentScore;
+    public GameManager gameManager;
+    private int pointInitial = 1;
+    private int pointGain;
 
     //Network
     private string apiUrl = "http://127.0.0.1:8000/score";
 
-    //[UI]
-    public TextMeshProUGUI currentScoreText;
-    public GameManager gameManager;
-
+    
+    
     void Start()
     {
         //Debug.Log(gameManager.totalClicks);
@@ -23,28 +23,48 @@ public class ClickerController : MonoBehaviour
 
     void Update()
     {
-        currentScoreText.text = currentScore.ToString();
-
+        
     }
 
     public void Click()
     {
-        currentScore++;
-        StartCoroutine(CallApi(1));
-    
+        pointGain = pointInitial * GameManager.doubleMultAmount;
+        Debug.Log(pointGain);
+
+        GameManager.currentScore += pointGain;
+        GameManager.totalScore += pointGain;
+        StartCoroutine(CallApi(pointGain));
     }
 
-    public void ClickWithMultiplier(int value)
+    /*public void ClickWithMultiplier(int value) //Multiply by designated amount
     {
-        //alue += 
-        currentScore++;
-        StartCoroutine(CallApi(value));
+        int points;
 
-    }
+        points = value * 1;
+        GameManager.currentScore++;
+        StartCoroutine(CallApi(points));
+
+    }*/
 
     IEnumerator CallApi(int value)
     {
-        using (UnityWebRequest request = UnityWebRequest.Get(apiUrl+"?score="+value))
+        // using (UnityWebRequest request = UnityWebRequest.Get(apiUrl+"?currency="+GameManager.currentScore))
+        // {
+        //     yield return request.SendWebRequest();
+
+        //     if (request.result == UnityWebRequest.Result.ConnectionError ||
+        //         request.result == UnityWebRequest.Result.ProtocolError)
+        //     {
+        //         Debug.LogError("API Error: " + request.error);
+        //     }
+        //     else
+        //     {
+        //         string jsonResponse = request.downloadHandler.text;
+        //         Debug.Log("API Response: " + jsonResponse);
+        //     }
+        // }
+
+        using (UnityWebRequest request = UnityWebRequest.Get(apiUrl+"?score="+GameManager.totalScore+"&currency="+GameManager.currentScore))
         {
             yield return request.SendWebRequest();
 
